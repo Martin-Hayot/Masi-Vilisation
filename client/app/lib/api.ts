@@ -13,7 +13,10 @@ import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
  *   api.get("/protected_route"); // will automatically attempt refresh on 401
  */
 
-const BASE_URL = (import.meta as any).env?.VITE_API_URL || "";
+const BASE_URL = (import.meta as any).env?.VITE_API_URL;
+if (!BASE_URL) {
+  throw new Error("VITE_API_URL environment variable is not set. Please configure it in your environment.");
+}
 
 const api = axios.create({
   baseURL: BASE_URL,
