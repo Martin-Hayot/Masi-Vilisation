@@ -40,10 +40,7 @@ export const createUser = async (
 
   try {
     const user = await userService.createUser(username, email, password);
-
-    if (!user) {
-      return res.status(500).json({ error: 'Failed to create user' });
-    }
+    logger.info(`User created with ID: ${user.id}`);
     res.status(201).json({
       id: user.id,
       email: user.email,

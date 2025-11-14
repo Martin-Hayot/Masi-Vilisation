@@ -70,10 +70,6 @@ export const refresh = async (
   next: NextFunction,
 ) => {
   try {
-    // Try multiple places for the refresh token:
-    // 1) cookie (common with browsers)
-    // 2) request body (for clients that send it explicitly)
-    // 3) custom header `x-refresh-token` (optional)
     const refreshToken =
       (req as any).cookies?.refreshToken ||
       req.body?.refreshToken ||
@@ -83,7 +79,8 @@ export const refresh = async (
       return res.status(401).json({ error: 'Refresh token required' });
     }
 
-    const { accessToken } = await authService.refresh(refreshToken);
+    const { accessToken, refreshToken: newRefreshToken } =
+      await authService.refresh(refreshToken);
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
@@ -92,7 +89,7 @@ export const refresh = async (
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
