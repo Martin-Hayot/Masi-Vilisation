@@ -40,5 +40,5 @@ next-env.d.ts
 dist/
 server/src/**/*.js
 server/src/**/*.d.ts
-server/src/**/*.js.map
 server/src/**/*.d.ts.map
+server/src/**/*.js.map

@@ -4,7 +4,7 @@ export const UserCreateRequest = z.object({
   username: z
     .string('Username is required')
     .min(2, 'Username must be at least 2 characters long')
-    .max(50, 'Username must be at most 15 characters long'),
+    .max(50, 'Username must be at most 50 characters long'),
   email: z.email('Invalid email address'),
   password: z
     .string()
