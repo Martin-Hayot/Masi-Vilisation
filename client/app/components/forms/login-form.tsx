@@ -30,7 +30,7 @@ const LoginForm = () => {
   });
 
   const navigate = useNavigate();
-  const { login, refresh } = useAuth();
+  const { login } = useAuth();
 
   function onSubmit(data: z.infer<typeof loginSchema>) {
     const body = {

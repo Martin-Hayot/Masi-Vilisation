@@ -19,10 +19,7 @@ import { Toaster } from "sonner";
  * Note: the actual guards/components are implemented in
  * `./components/providers/auth-provider`.
  */
-import AuthProvider, {
-  RequireAuth,
-  RedirectIfAuthenticated,
-} from "./components/providers/auth-provider";
+import AuthProvider from "./components/providers/auth-provider";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
