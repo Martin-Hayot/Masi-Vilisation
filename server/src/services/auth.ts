@@ -3,10 +3,15 @@ import { userRepository } from '../repositories/user';
 import { verifyPassword } from '../utils/auth';
 import { User } from '@prisma/client';
 
-const ACCESS_TOKEN_SECRET: jwt.Secret =
-  process.env.ACCESS_TOKEN_SECRET || 'default_access_secret_change_me';
-const REFRESH_TOKEN_SECRET: jwt.Secret =
-  process.env.REFRESH_TOKEN_SECRET || 'default_refresh_secret_change_me';
+if (!process.env.ACCESS_TOKEN_SECRET) {
+  throw new Error('ACCESS_TOKEN_SECRET environment variable is required');
+}
+if (!process.env.REFRESH_TOKEN_SECRET) {
+  throw new Error('REFRESH_TOKEN_SECRET environment variable is required');
+}
+
+const ACCESS_TOKEN_SECRET: jwt.Secret = process.env.ACCESS_TOKEN_SECRET!;
+const REFRESH_TOKEN_SECRET: jwt.Secret = process.env.REFRESH_TOKEN_SECRET!;
 const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || '15m';
 const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 

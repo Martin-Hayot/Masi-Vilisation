@@ -37,6 +37,7 @@ yarn-error.log*
 next-env.d.ts
 
 # compiled output
+dist/
 server/src/**/*.js
 server/src/**/*.d.ts
 server/src/**/*.d.ts.map
