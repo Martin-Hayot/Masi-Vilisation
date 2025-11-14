@@ -9,11 +9,19 @@ export const userRepository = {
     return await db.user.findUnique({ where: { id } });
   },
 
+  async getUserByUsername(username: string) {
+    return await db.user.findUnique({ where: { username } });
+  },
+
   async getUserByEmail(email: string) {
     return await db.user.findUnique({ where: { email } });
   },
 
-  async createUser(data: { email: string; password: string }) {
+  async createUser(data: {
+    username: string;
+    email: string;
+    password: string;
+  }) {
     return await db.user.create({ data });
   },
 };
