@@ -36,14 +36,14 @@ export const createUser = async (
     return res.status(400).json({ error: parseResult.error });
   }
 
-  const { email, password } = parseResult.data;
+  const { username, email, password } = parseResult.data;
 
   try {
-    const user = await userService.createUser(email, password);
+    const user = await userService.createUser(username, email, password);
+
     if (!user) {
-      return res.status(409).json({ error: 'User already exists' });
+      return res.status(500).json({ error: 'Failed to create user' });
     }
-    logger.info(`Successfully created user with ID: ${user.id}`);
     res.status(201).json({
       id: user.id,
       email: user.email,

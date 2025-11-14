@@ -9,6 +9,20 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { ThemeProvider } from "./components/providers/theme-provider";
+import { Toaster } from "sonner";
+
+/**
+ * Expose authentication provider and guards from the root so route components
+ * can import them (e.g. login/dashboard) and apply route-level guarding.
+ *
+ * Note: the actual guards/components are implemented in
+ * `./components/providers/auth-provider`.
+ */
+import AuthProvider, {
+  RequireAuth,
+  RedirectIfAuthenticated,
+} from "./components/providers/auth-provider";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,8 +47,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          {/* Wrap the whole app with the AuthProvider so route-level guards and
+              components can access auth state via context */}
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
         <ScrollRestoration />
+        <Toaster position="top-right" theme="dark" richColors />
         <Scripts />
       </body>
     </html>
