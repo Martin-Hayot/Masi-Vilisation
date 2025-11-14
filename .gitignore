@@ -35,3 +35,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# compiled output
+server/src/**/*.js
+server/src/**/*.d.ts
+server/src/**/*.d.ts.map
+server/src/**/*.js.map
