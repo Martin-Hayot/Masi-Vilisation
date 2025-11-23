@@ -26,15 +26,18 @@
     "nodemon": "^3.1.10",
     "npm": "^11.6.2",
     "prettier": "^3.6.2",
+    "prisma": "^7.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.0",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
     "winston": "^3.18.3",
     "zod": "^4.1.12"
   }

@@ -1,6 +1,6 @@
 import app from './app';
 import config from './config/config';
-import db from './repositories/db';
+import { db } from './lib/prisma';
 import logger from './utils/logger';
 
 const server = app.listen(config.port, () => {
