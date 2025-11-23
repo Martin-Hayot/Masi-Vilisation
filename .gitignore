@@ -5,6 +5,10 @@ node_modules/
 .pnp
 .pnp.js
 
+# prisma
+generated/
+generated/prisma/
+
 # local files
 migrations/
 
