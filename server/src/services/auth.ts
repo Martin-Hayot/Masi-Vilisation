@@ -2,6 +2,11 @@ import jwt from 'jsonwebtoken';
 import { userRepository } from '../repositories/user';
 import { verifyPassword } from '../utils/auth';
 import { User } from '@prisma/client';
+import {
+  UnauthorizedError,
+  NotFoundError,
+  InternalServerError,
+} from '../errors';
 
 if (!process.env.ACCESS_TOKEN_SECRET) {
   throw new Error('ACCESS_TOKEN_SECRET environment variable is required');
@@ -16,15 +21,50 @@ const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || '15m';
 const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 
 export const authService = {
+  async getUserFromToken(token: string) {
+    try {
+      const payload = jwt.verify(token, ACCESS_TOKEN_SECRET as jwt.Secret);
+      if (typeof payload === 'string' || !(payload as any).sub) {
+        throw new UnauthorizedError('Invalid token payload');
+      }
+
+      const userId = (payload as any).sub as string;
+      const user = await userRepository.getUserById(userId);
+      if (!user) {
+        throw new NotFoundError('User not found');
+      }
+
+      return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      };
+    } catch (err: any) {
+      // If it's already one of our custom errors, re-throw it
+      if (err.statusCode) {
+        throw err;
+      }
+
+      // Handle JWT-specific errors
+      if (err.name === 'TokenExpiredError') {
+        throw new UnauthorizedError('Access token expired');
+      }
+      if (err.name === 'JsonWebTokenError') {
+        throw new UnauthorizedError('Invalid access token');
+      }
+
+      throw new UnauthorizedError('Invalid or expired access token');
+    }
+  },
   async login(email: string, password: string) {
     const user = await userRepository.getUserByEmail(email);
     if (!user) {
-      throw new Error('Invalid email or password');
+      throw new UnauthorizedError('Invalid email or password');
     }
 
     const isValid = await verifyPassword(password, user.password);
     if (!isValid) {
-      throw new Error('Invalid email or password');
+      throw new UnauthorizedError('Invalid email or password');
     }
 
     const accessToken = this.generateAccessToken(user);
@@ -59,7 +99,7 @@ export const authService = {
       ) as jwt.JwtPayload | string;
 
       if (typeof payload === 'string') {
-        throw new Error('Invalid refresh token payload');
+        throw new UnauthorizedError('Invalid refresh token payload');
       }
 
       if (
@@ -67,13 +107,13 @@ export const authService = {
         (payload as any).type !== 'refresh' ||
         !(payload as any).sub
       ) {
-        throw new Error('Invalid refresh token');
+        throw new UnauthorizedError('Invalid refresh token');
       }
 
       const userId = (payload as any).sub as string;
       const user = await userRepository.getUserById(userId);
       if (!user) {
-        throw new Error('User not found for refresh token');
+        throw new NotFoundError('User not found for refresh token');
       }
 
       const accessToken = this.generateAccessToken(user);
@@ -82,14 +122,22 @@ export const authService = {
 
       return { accessToken, refreshToken: newRefreshToken };
     } catch (err: any) {
-      // Normalize errors so handlers can decide proper HTTP responses
+      // If it's already one of our custom errors, re-throw it
+      if (err.statusCode) {
+        throw err;
+      }
+
+      // Handle JWT-specific errors
       if (err.name === 'TokenExpiredError') {
-        throw new Error('Refresh token expired');
+        throw new UnauthorizedError('Refresh token expired');
       }
       if (err.name === 'JsonWebTokenError') {
-        throw new Error('Invalid refresh token');
+        throw new UnauthorizedError('Invalid refresh token');
       }
-      throw new Error(err.message || 'Failed to refresh access token');
+
+      throw new UnauthorizedError(
+        err.message || 'Failed to refresh access token',
+      );
     }
   },
 
@@ -106,7 +154,7 @@ export const authService = {
       );
       return token;
     } catch (err) {
-      throw new Error('Failed to generate access token');
+      throw new InternalServerError('Failed to generate access token');
     }
   },
 
@@ -123,7 +171,7 @@ export const authService = {
       );
       return token;
     } catch (err) {
-      throw new Error('Failed to generate refresh token');
+      throw new InternalServerError('Failed to generate refresh token');
     }
   },
 };
